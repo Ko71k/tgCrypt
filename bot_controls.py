@@ -3,7 +3,7 @@ from telebot import TeleBot
 from telebot import types
 #add your token here
 #TODO: #from config import TOKEN
-bot = TeleBot('token')
+bot = TeleBot('7488569046:AAElNQ9z2sI4osqnSx4TZ3Qh-fUz2eOl9HQ')
 age = 0
 name = "Alex"
 
@@ -16,8 +16,8 @@ def get_text_messages(message):
         f = open("inputdata", "w")
         f.write(message.text)
         f.close()
-        #encrypt(message)
-        #decrypt(message)
+        encrypt(message)
+        decrypt(message)
         keyboard = types.InlineKeyboardMarkup() #наша клавиатура
         key_yes = types.InlineKeyboardButton(text='Да', callback_data="yes") #кнопка «Да»
         key_no  = types.InlineKeyboardButton(text='Нет', callback_data="no")
@@ -26,7 +26,7 @@ def get_text_messages(message):
         bot.send_message(message.chat.id, text=question, reply_markup=keyboard)
 
 def encrypt(message):
-    subprocess.run("encrypt.exe inputdata Alex encrypteddata", shell = True)
+    subprocess.run("encrypt.exe inputdata encrypteddata Alex", shell = True)
     bot.send_message(message.from_user.id, 'data encrypted')
 
 def decrypt(message):
