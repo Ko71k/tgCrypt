@@ -1,5 +1,5 @@
 ```
-gcc crypt.c -o encrypt.exe -lcrypt32
+gcc encrypt.c -o encrypt.exe -lcrypt32
 gcc decrypt.c -o decrypt.exe -lcrypt32
 
 .\encrypt.exe test.txt Alex encrypted.txt
