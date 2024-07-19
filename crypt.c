@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     }
     //char* targetCN = "CN=";
     //targetCN = strcat(targetCN, argv[2]);
-    char* targetCN = argv[2];
+    char* targetCN = argv[3];
     // Открытие файла.
     if (!(hFile = fopen(argv[1], "rb"))) {
         HandleError("Error opening input file");
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 
 
     FILE *writeHere;
-    if (!(writeHere = fopen(argv[3], "wb"))) {
+    if (!(writeHere = fopen(argv[2], "wb"))) {
         HandleError("Error opening output file");
     }
     // Вызов функции DecryptMessage, код которой описан после main, для расшифрования сообщения.
