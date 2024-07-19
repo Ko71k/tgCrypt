@@ -26,11 +26,15 @@ def get_text_messages(message):
         bot.send_message(message.chat.id, text=question, reply_markup=keyboard)
 
 def encrypt(message):
-    subprocess.run("encrypt.exe inputdata encrypteddata Alex", shell = True)
+    call_encrypt = "encrypt.exe inputdata encrypteddata "
+    call_encrypt += name
+    subprocess.run(call_encrypt, shell = True)
     bot.send_message(message.from_user.id, 'data encrypted')
 
 def decrypt(message):
-    subprocess.run("decrypt.exe encrypteddata Alex", shell = True) #to decrypted.txt
+    call_decrypt = "decrypt.exe encrypteddata "
+    call_decrypt += name
+    subprocess.run(call_decrypt, shell = True) #to decrypted.txt
     f = open("decrypted.txt", "r")
     bot.send_message(message.from_user.id, f.read())
 
