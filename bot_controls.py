@@ -1,9 +1,9 @@
 import subprocess
 from telebot import TeleBot
 from telebot import types
+from config import TOKEN
 #add your token here
-#TODO: #from config import TOKEN
-bot = TeleBot('7488569046:AAElNQ9z2sI4osqnSx4TZ3Qh-fUz2eOl9HQ')
+bot = TeleBot(TOKEN)
 age = 0
 name = "Alex"
 
