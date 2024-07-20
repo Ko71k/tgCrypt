@@ -16,38 +16,37 @@ def get_text_messages(message):
         f = open("inputdata", "w")
         f.write(message.text)
         f.close()
-        encrypt(message)
-        decrypt(message)
+        #encrypt(message)
+        #decrypt(message)
         keyboard = types.InlineKeyboardMarkup() #наша клавиатура
-        key_yes = types.InlineKeyboardButton(text='Да', callback_data="yes") #кнопка «Да»
-        key_no  = types.InlineKeyboardButton(text='Нет', callback_data="no")
+        key_yes = types.InlineKeyboardButton(text='Encrypt', callback_data=("encrypt")) #кнопка «Да»
+        key_no  = types.InlineKeyboardButton(text='Decrypt', callback_data=("decrypt"))
         keyboard.add(key_yes, key_no) #добавляем кнопку в клавиатуру
-        question = 'Тебе '+str(age)+' лет?'
-        bot.send_message(message.chat.id, text=question, reply_markup=keyboard)
+        question = 'What to do with data?'
+        bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
 
 def encrypt(message):
     call_encrypt = "encrypt.exe inputdata encrypteddata "
     call_encrypt += name
     subprocess.run(call_encrypt, shell = True)
-    bot.send_message(message.from_user.id, 'data encrypted')
+    bot.send_message(message.chat.id, 'data encrypted')
 
 def decrypt(message):
-    call_decrypt = "decrypt.exe encrypteddata "
+    call_decrypt = "decrypt.exe inputdata "
     call_decrypt += name
     subprocess.run(call_decrypt, shell = True) #to decrypted.txt
     f = open("decrypted.txt", "r")
-    bot.send_message(message.from_user.id, f.read())
+    bot.send_message(message.chat.id, f.read())
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     message = call.message
     chat_id = message.chat.id
-    message_id = message.message_id  
-    if call.data == "yes":
-        bot.send_message(call.message.chat.id, 'Да')
-    elif call.data == "no":
-        #переспрашиваем
-        bot.send_message(call.message.chat.id, 'Нет')
+    message_id = message.message_id
+    if call.data == "encrypt":
+        encrypt(message)
+    elif call.data == "decrypt":
+        decrypt(message)
     bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text='Принято!') 
