@@ -55,12 +55,12 @@ int main(int argc, char *argv[])
     long fileSize;
     BYTE* pbContent;
 
-    if (argc != 3 || argv[1] == NULL || argv[2] == NULL) {
+    if (argc != 4 || argv[1] == NULL || argv[2] == NULL || argv[3] == NULL) {
         HandleError("The file name or CN is absent.\n");
     }
     //char* targetCN = "CN=";
-    //targetCN = strcat(targetCN, argv[2]);
-    char* targetCN = argv[2];
+    //targetCN = strcat(targetCN, argv[3]);
+    char* targetCN = argv[3];
     // Открытие файла.
     if (!(hFile = fopen(argv[1], "rb"))) {
         HandleError("Error opening input file");
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     FILE *writeHere;
-    if (!(writeHere = fopen("decrypted.txt", "wb"))) {
+    if (!(writeHere = fopen(argv[2], "wb"))) {
         HandleError("Error opening output file");
     }
     // Вызов функции DecryptMessage, код которой описан после main, для расшифрования сообщения.
