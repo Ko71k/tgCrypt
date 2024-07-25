@@ -41,7 +41,7 @@
 
 static void CleanUp(void);
 static void HandleError(const char *s);
-static PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore);
+static PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore, char* targetCN);
 static void DecryptMessage(BYTE *pbEncryptedBlob, DWORD cbEncryptedBlob, FILE *writeHere);
 static void GetCertDName(PCERT_NAME_BLOB pNameBlob, char **pszName);
 
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
     // Получение указателя на сертификат получателя с помощью
     // функции GetRecipientCert. 
-    pRecipientCert = GetRecipientCert(hStoreHandle);
+    pRecipientCert = GetRecipientCert(hStoreHandle, targetCN);
 
     if(!pRecipientCert)
     {
@@ -252,7 +252,7 @@ static BOOL isGostType(DWORD dwProvType) {
 // GetRecipientCert перечисляет сертификаты в хранилище и находит
 // первый сертификат, обладающий ключем AT_EXCHANGE. Если сертификат
 // сертификат найден, то возвращается указатель на него.
-PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore) 
+PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore, char* targetCN) 
 { 
     PCCERT_CONTEXT pCertContext = NULL; 
     BOOL bCertNotFind = TRUE; 
@@ -278,6 +278,22 @@ PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore)
 	    pCertContext);
 	if ( !pCertContext )
 	    break;
+    
+    static char *szDName = NULL;
+    GetCertDName(&pCertContext->pCertInfo->Subject, &szDName);
+    long long int result_length = strstr(szDName, ", OU=") - strstr(szDName, "CN=") - 3;
+    char* res = (char*)malloc(result_length*sizeof(char));
+    strncpy(res, strstr(szDName, "CN=") + 3, result_length);
+    printf("\nResult of slice is: %s\n", res);
+    if (strcmp(res, targetCN) != 0)
+    {
+        printf("Checked for %s\n", res);
+        continue;
+    }
+    else
+    {
+        printf("Found %s!\n", targetCN);
+    }
 
 	// Для простоты в этом коде реализован только поиск первого 
 	// вхождения ключа AT_KEYEXCHANGE. Во многих случаях, помимо 
