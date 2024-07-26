@@ -74,10 +74,10 @@ def encrypt(message, file_name):
         bot.send_document(message.chat.id,f)
         f.close()
         os.remove("e" + file_name)
-        os.remove("inputdata.txt")
+        os.remove(file_name)
     except:
         bot.send_message(message.chat.id, "ERROR:CN not found, try /changeCN.")
-        os.remove("inputdata.txt")
+        os.remove(file_name)
     
 def decrypt(message, file_name):
     global name
