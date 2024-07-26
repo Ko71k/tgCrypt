@@ -1,6 +1,7 @@
 import subprocess
 from telebot import TeleBot
 from telebot import types
+import os
 from config import TOKEN
 #add your token here
 bot = TeleBot(TOKEN)
@@ -64,8 +65,11 @@ def encrypt(message, file_name):
         bot.send_message(message.chat.id, 'data encrypted')
         bot.send_document(message.chat.id,f)
         f.close()
+        os.remove("e" + file_name)
+        os.remove("inputdata.txt")
     except:
         bot.send_message(message.chat.id, "ERROR:CN not found, try /changeCN.")
+        os.remove("inputdata.txt")
     
 
 def decrypt(message, file_name):
@@ -84,10 +88,14 @@ def decrypt(message, file_name):
         f = open("d" + file_name, "rb")
         bot.send_message(message.chat.id, f.read())
         f.close()
+        os.remove("d" + file_name)
+        os.remove(file_name)
     except:
         f = open("d" + file_name, "rb")
         bot.send_document(message.chat.id,f)
         f.close()
+        os.remove("d" + file_name)
+        os.remove(file_name)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
