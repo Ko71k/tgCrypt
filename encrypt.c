@@ -42,7 +42,6 @@
 static void CleanUp(void);
 static void HandleError(const char *s);
 static PCCERT_CONTEXT GetRecipientCert(HCERTSTORE hCertStore, char* targetCN);
-static void DecryptMessage(BYTE *pbEncryptedBlob, DWORD cbEncryptedBlob, FILE *writeHere);
 static void GetCertDName(PCERT_NAME_BLOB pNameBlob, char **pszName);
 
 static HCRYPTPROV hCryptProv = 0;        // дескриптор CSP 
@@ -210,38 +209,12 @@ int main(int argc, char *argv[])
         HandleError("Error opening output file");
     }
     // Вызов функции DecryptMessage, код которой описан после main, для расшифрования сообщения.
-    DecryptMessage(pbEncryptedBlob, cbEncryptedBlob, writeHere);
+    //DecryptMessage(pbEncryptedBlob, cbEncryptedBlob, writeHere);
+    size_t r1 = fwrite(pbEncryptedBlob, sizeof(BYTE), cbEncryptedBlob, writeHere);
+    printf("Wrote %zu elements out of %d requested to the file, excluding the \\0 symbol.\n", r1, cbEncryptedBlob);
     fclose(writeHere);
     CleanUp();
     return 0;
-}
-
-//  Определение функции DecryptMessage.
-// Пример функции для расшифрования зашифрованного сообщения с 
-// использованием функции CryptDecryptMessage. ЕЕ параметрами являются
-// pbEncryptedBlob, зашифрованное сообщение; cbEncryptedBlob, длина
-// этого сообщения
-void DecryptMessage(BYTE *pbEncryptedBlob, DWORD cbEncryptedBlob, FILE *writeHere)
-{
-    DWORD cbDecryptedMessage;
-    CRYPT_DECRYPT_MESSAGE_PARA  decryptParams;
-
-    BYTE*  pbDecryptedMessage = NULL;
-
-    // Получение указателя на зашифрованное сообщение, pbEncryptedBlob,
-    // и его длину, cbEncryptedBlob. В этом примере они устанавливаются
-    // как параметры совместно с  CSP и дескриптором открытого хранилища.
-    // Просмотр зашифрованного BLOBа.
-    char * ep = getenv("COLUMNS");
-    int brk;
-    int i;
-    brk = ep ? atoi(ep) : 80;
-    brk = ((brk <= 3) ? 80 : brk) / 3;
-    
-    //Запись
-    size_t r1 = fwrite(pbEncryptedBlob, sizeof(BYTE), cbEncryptedBlob, writeHere);
-    printf("Wrote %zu elements out of %d requested to the file, excluding the \\0 symbol.\n", r1, cbEncryptedBlob);
-    return;
 }
 
 // Проверка типа провайдера 
