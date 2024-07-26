@@ -106,7 +106,17 @@ def decrypt(message, file_name):
 
 def add_cert(message, file_name):
     #"c:\Program Files\Crypto Pro\CSP\certmgr.exe"
-    bot.send_message(message.chat.id, "Adding as a cert " + file_name)
+    #"c:\Program Files\Crypto Pro\CSP\certmgr.exe" -install -file alex22.pfx -pfx -silent -pin r 
+    bot.send_message(message.chat.id, "Adding as a cert " + file_name + "\nEnter the password:")
+    bot.register_next_step_handler(message, install_cert, file_name)
+
+def install_cert(message, file_name):
+    print("\ninstalling with file-name =", file_name)
+    runner = '"c:\Program Files\Crypto Pro\CSP\certmgr.exe" -install -file ' + file_name + ' -pin ' + message.text + ' -silent'
+    answer = subprocess.run(runner, capture_output=True, shell=True)
+    print(runner)
+    print(answer.stdout.decode('cp866'))
+    bot.send_message(message.chat.id, answer.stdout.decode('cp866'))
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
