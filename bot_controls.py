@@ -117,6 +117,7 @@ def install_cert(message, file_name):
     print(runner)
     print(answer.stdout.decode('cp866'))
     bot.send_message(message.chat.id, answer.stdout.decode('cp866').split('=============================================================================')[-1])
+    os.remove(file_name)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
