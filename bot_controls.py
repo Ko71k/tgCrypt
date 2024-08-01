@@ -6,7 +6,7 @@ from config import TOKEN
 #add your token here
 bot = TeleBot(TOKEN)
 age = 0
-name = ""
+name = "alex31"
 #@bot.message_handler(content_types=['document', 'photo', 'audio', 'video', 'voice']) # list relevant content types
 @bot.message_handler(content_types=['text', 'document'])
 def get_text_messages(message):
@@ -17,7 +17,7 @@ def get_text_messages(message):
         bot.register_next_step_handler(message, changeCN)
     elif message.text == "/help":
         bot.send_message(message.from_user.id, "Current name is " + name)
-        bot.send_message(message.from_user.id, "/enterCN to change CN, default is none\n\n/list_certificates to assess current certificates")
+        bot.send_message(message.from_user.id, "/changeCN to change CN, default is none\n\n/list_certificates to assess current certificates")
     elif message.text == "/list_certificates":
         answer = subprocess.run('"c:\Program Files\Crypto Pro\CSP\certmgr.exe" -list', capture_output=True)
         parsed_answer = answer.stdout.decode('cp866').split('-------')
@@ -104,6 +104,53 @@ def decrypt(message, file_name):
         os.remove("d" + file_name)
         os.remove(file_name)
 
+def certificate_decrypt(message, file_name):
+    global name
+    runner = '.\cryptcp.x64.exe -decr -dn "CN=' + name + '" ' + file_name + ' ' + 'decrypted.' + file_name + ' -nochain'
+    print(runner)
+    answer = subprocess.run(runner, capture_output=True, shell=True)
+    bot.send_message(message.chat.id, answer.stdout.decode('cp866'))
+    try:
+        f = open("decrypted." + file_name, "r")
+        bot.send_document(message.chat.id, f)
+        f.close()
+        os.remove(file_name)
+        os.remove("decrypted." + file_name)
+    except:
+        bot.send_message(message.chat.id, "Huh, try again")
+    return
+
+def cert_encrypt(message, file_name):
+    bot.send_message(message.chat.id, "Encrypting file " + file_name + "\nSend a certificate:")
+    bot.register_next_step_handler(message, certificate_reciever_encrypt, file_name)
+
+def certificate_reciever_encrypt(message, file_name1):
+    if (message.document):
+        cert_name = message.document.file_name
+        file_info = bot.get_file(message.document.file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        with open(cert_name, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        new_file.close()
+        runner = '.\cryptcp.x64.exe -encr -f ' + cert_name + ' ' + file_name1 + " encrypted." + file_name1 + ' -nochain'
+        print(runner)
+        answer = subprocess.run(runner, capture_output=True, shell=True)
+        bot.send_message(message.chat.id, answer.stdout.decode('cp866'))
+        try:
+            f = open("encrypted." + file_name1, "rb")
+            bot.send_document(message.chat.id, f)
+            f.close()
+            os.remove(cert_name)
+            os.remove(file_name1)
+            os.remove("encrypted." + file_name1)
+        except:
+            bot.send_message(message.chat.id, "Huh, try again")
+            return
+    else:
+        bot.send_message(message.chat.id, "Huh, try again")
+        os.remove(cert_name)
+        return
+
 def add_cert(message, file_name):
     #"c:\Program Files\Crypto Pro\CSP\certmgr.exe"
     #"c:\Program Files\Crypto Pro\CSP\certmgr.exe" -install -file alex22.pfx -pfx -silent -pin r 
@@ -126,9 +173,11 @@ def callback_worker(call):
     message_id = message.message_id
     parsed_data = call.data.split('|')
     if parsed_data[0] == "e":
-        encrypt(message, call.data[2:])
+        #encrypt(message, call.data[2:])
+        cert_encrypt(message, call.data[2:])
     elif parsed_data[0] == "d":
-        decrypt(message, call.data[2:])
+        #decrypt(message, call.data[2:])
+        certificate_decrypt(message, call.data[2:])
     elif parsed_data[0] == "add_cert":
         add_cert(message, parsed_data[1])
 
